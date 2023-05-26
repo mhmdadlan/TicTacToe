@@ -22,8 +22,8 @@ class TicTacToe {
         this._xmark.src = "../images/xmark.svg";
         this._omark.src = "../images/omark.svg";
         this.setCurrentPlayer(this._playerX);
-        tiles.forEach(element => {
-            element.addEventListener("click", (ev) => this.markTile(ev));
+        tiles.forEach((element, index) => {
+            element.addEventListener("click", () => this.markTile(element, index));
         });
     }
     reset() {
@@ -33,6 +33,9 @@ class TicTacToe {
             element.textContent = "";
             element.dataset.selectedBy = undefined;
         });
+    }
+    updateBoard(index) {
+        this.Board[index] = this.CurrentPlayer;
     }
     ChangePlayer() {
         if (this.CurrentPlayer == this._playerX)
@@ -44,8 +47,7 @@ class TicTacToe {
         this.CurrentPlayer = player;
         this.CurrentPlayerDisplay.textContent = `Current Player is ${player}`;
     }
-    markTile(ev) {
-        let tile = ev.currentTarget;
+    markTile(tile, index) {
         if (tile.dataset.selectedBy == this._playerX || tile.dataset.selectedBy == this._playerO)
             return;
         if (this.CurrentPlayer == this._playerX) {
@@ -56,7 +58,26 @@ class TicTacToe {
             tile.dataset.selectedBy = this._playerO;
             tile.append(this._omark.cloneNode());
         }
+        this.updateBoard(index);
+        this.IsWon();
         this.ChangePlayer();
+    }
+    IsWon() {
+        let gameWon = false;
+        for (let i = 0; i <= 7; i++) {
+            let winningCondition = this.WinningConditions[i];
+            let a = this.Board[winningCondition[0]];
+            let b = this.Board[winningCondition[1]];
+            let c = this.Board[winningCondition[2]];
+            if (a === "" || b === "" || c === "")
+                continue;
+            if (a === b && b === c) {
+                gameWon = true;
+                break;
+            }
+        }
+        if (gameWon)
+            alert(this._playerX + " Has Won!");
     }
 }
 const resetButtuon = document.getElementById("reset_button");

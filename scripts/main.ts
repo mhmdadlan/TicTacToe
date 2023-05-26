@@ -11,7 +11,7 @@ class TicTacToe {
 
     Board: Array<string> = new Array<string>("", "", "", "", "", "", "", "", "");
 
-    WinningConditions: Array<Array<Number>> = [
+    WinningConditions: Array<Array<number>> = [
         [0, 1, 2],
         [3, 4, 5],
         [6, 7, 8],
@@ -29,21 +29,22 @@ class TicTacToe {
         this._omark.src = "../images/omark.svg";
         this.setCurrentPlayer(this._playerX);
 
-        tiles.forEach(element => {
-            element.addEventListener("click", (ev: MouseEvent) => this.markTile(ev));
+        tiles.forEach((element, index) => {
+            element.addEventListener("click", () => this.markTile(element, index));
         });
-
     }
 
     private reset() {
         if (this.CurrentPlayer !== this._playerX)
             this.setCurrentPlayer(this._playerX);
         tiles.forEach(element => {
-           element.textContent = "";
-           element.dataset.selectedBy = undefined;
+            element.textContent = "";
+            element.dataset.selectedBy = undefined;
         });
     }
-
+    private updateBoard(index: number) {
+        this.Board[index] = this.CurrentPlayer;
+    }
     private ChangePlayer() {
         if (this.CurrentPlayer == this._playerX)
             this.setCurrentPlayer(this._playerO)
@@ -56,21 +57,45 @@ class TicTacToe {
         this.CurrentPlayerDisplay.textContent = `Current Player is ${player}`;
     }
 
-    private markTile(ev: MouseEvent) {
-        let tile = ev.currentTarget as HTMLDivElement;
+    private markTile(tile, index) {
 
         if (tile.dataset.selectedBy == this._playerX || tile.dataset.selectedBy == this._playerO)
             return;
-
+            
         if (this.CurrentPlayer == this._playerX) {
             tile.dataset.selectedBy = this._playerX;
             tile.append(this._xmark.cloneNode());
+
         } else if (this.CurrentPlayer == this._playerO) {
             tile.dataset.selectedBy = this._playerO;
             tile.append(this._omark.cloneNode());
         }
 
+        this.updateBoard(index);
+        this.IsWon();
         this.ChangePlayer();
+    }
+
+    private IsWon() {
+        let gameWon = false;
+
+        for (let i = 0; i <= 7; i++) {
+            let winningCondition = this.WinningConditions[i];
+            
+            let a = this.Board[winningCondition[0]];
+            let b = this.Board[winningCondition[1]];
+            let c = this.Board[winningCondition[2]];
+
+            if (a === "" || b === "" || c === "")
+                continue;
+            if (a === b && b === c){
+                gameWon = true;
+                break;
+            }
+        }
+
+        if(gameWon)
+            alert(this._playerX + " Has Won!");
     }
 }
 
