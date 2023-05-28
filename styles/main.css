@@ -1,8 +1,29 @@
-body{
+body {
     text-align: center;
+    background-color: #333;
 }
 
-header{
+#announcement {
+    width: 100%;
+    border: 1px solid;
+    padding: 10px;
+    margin: 20px;
+    border-color: #0288d1;
+    background-color: #29b6f6;
+    color: white;
+
+}
+
+#current_player_display {
+    background-color: #c3c3c3;
+    padding: 10px;
+    border-radius: 5px;
+}
+.hidden {
+    display: none;
+}
+
+header {
     font-size: 24px;
 }
 
@@ -13,7 +34,7 @@ header{
 }
 
 .playground {
-    margin:25px auto;
+    margin: 25px auto;
     background-color: #000;
     width: 600px;
     height: 600px;
@@ -26,20 +47,20 @@ header{
 }
 
 .tile {
-    background-color: #999;
+    background-color: #fff;
     width: 33%;
     position: relative;
 }
 
 button {
     background-color: red;
-     border:none;
-     color:white;
-     padding: 15px 32px;
-     text-align: center;
-     text-decoration: none;
-     display: inline-block;
-     font-size: large;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: large;
 }
 
 .tile img {
@@ -47,7 +68,7 @@ button {
     width: 120px;
     height: 120px;
     left: 50%;
-    margin-left: -60px ;
+    margin-left: -60px;
     top: 50%;
-    margin-top: -60px ;
+    margin-top: -60px;
 }

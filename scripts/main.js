@@ -1,70 +1,48 @@
 class TicTacToe {
-    constructor(resetButtuon, tiles, currentPlayerDisplay) {
-        this.IsGameActive = true;
-        this._playerX = 'X';
-        this._playerO = 'O';
-        this.CurrentPlayer = this._playerX;
-        this._xmark = document.createElement("img");
-        this._omark = document.createElement("img");
-        this.Board = new Array("", "", "", "", "", "", "", "", "");
-        this.WinningConditions = [
-            [0, 1, 2],
-            [3, 4, 5],
-            [6, 7, 8],
-            [0, 3, 6],
-            [1, 4, 7],
-            [2, 5, 8],
-            [0, 4, 8],
-            [2, 4, 6]
-        ];
-        resetButtuon.addEventListener("click", () => this.reset());
-        this.CurrentPlayerDisplay = currentPlayerDisplay;
-        this._xmark.src = "../images/xmark.svg";
-        this._omark.src = "../images/omark.svg";
-        this.setCurrentPlayer(this._playerX);
-        tiles.forEach((element, index) => {
-            element.addEventListener("click", () => this.markTile(element, index));
-        });
-    }
-    reset() {
-        if (this.CurrentPlayer !== this._playerX)
-            this.setCurrentPlayer(this._playerX);
-        tiles.forEach(element => {
-            element.textContent = "";
-            element.dataset.selectedBy = undefined;
-        });
-    }
-    updateBoard(index) {
-        this.Board[index] = this.CurrentPlayer;
-    }
-    ChangePlayer() {
-        if (this.CurrentPlayer == this._playerX)
-            this.setCurrentPlayer(this._playerO);
+    playerX = 'X';
+    playerO = 'O';
+    Board = new Array("", "", "", "", "", "", "", "", "");
+    CurrentPlayer;
+    IsGameActive = false;
+    IsTieGame = false;
+    WinningConditions = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6]
+    ];
+    onGameEndEvent = () => {
+        if (this.IsTieGame)
+            console.log("The game is Tied");
         else
-            this.setCurrentPlayer(this._playerX);
-    }
-    setCurrentPlayer(player) {
-        this.CurrentPlayer = player;
-        this.CurrentPlayerDisplay.textContent = `Current Player is ${player}`;
-    }
-    markTile(tile, index) {
-        if (tile.dataset.selectedBy == this._playerX || tile.dataset.selectedBy == this._playerO)
+            console.log("The Winner is player " + this.CurrentPlayer);
+    };
+    onSetCurrentPlayerEvent = () => {
+        console.log("Current player is " + this.CurrentPlayer);
+    };
+    MarkTile(tileIndex) {
+        if (!this.IsValidMove(tileIndex))
             return;
-        if (this.CurrentPlayer == this._playerX) {
-            tile.dataset.selectedBy = this._playerX;
-            tile.append(this._xmark.cloneNode());
-        }
-        else if (this.CurrentPlayer == this._playerO) {
-            tile.dataset.selectedBy = this._playerO;
-            tile.append(this._omark.cloneNode());
-        }
-        this.updateBoard(index);
-        this.IsWon();
-        this.ChangePlayer();
+        this.updateBoard(tileIndex);
+        this.ValidateGameState();
+        if (this.IsGameActive)
+            this.ChangePlayer();
     }
-    IsWon() {
+    IsValidMove(tileIndex) {
+        if (!this.IsGameActive || this.Board[tileIndex] != "")
+            return false;
+        return true;
+    }
+    updateBoard(tileIndex) {
+        this.Board[tileIndex] = this.CurrentPlayer;
+    }
+    ValidateGameState() {
         let gameWon = false;
-        for (let i = 0; i <= 7; i++) {
+        for (let i = 0; i < this.WinningConditions.length; i++) {
             let winningCondition = this.WinningConditions[i];
             let a = this.Board[winningCondition[0]];
             let b = this.Board[winningCondition[1]];
@@ -76,11 +54,77 @@ class TicTacToe {
                 break;
             }
         }
-        if (gameWon)
-            alert(this._playerX + " Has Won!");
+        if (gameWon) {
+            this.onGameEndEvent.call(this);
+            this.IsGameActive = false;
+        }
+        if (!this.Board.includes("")) {
+            this.IsTieGame = true;
+            this.onGameEndEvent.call(this);
+        }
+    }
+    ChangePlayer() {
+        if (this.CurrentPlayer == this.playerX)
+            this.SetCurrentPlayer(this.playerO);
+        else
+            this.SetCurrentPlayer(this.playerX);
+    }
+    SetCurrentPlayer(player) {
+        this.CurrentPlayer = player;
+        this.onSetCurrentPlayerEvent.bind(this).call();
+    }
+    Start() {
+        this.IsGameActive = true;
+        this.SetCurrentPlayer(this.playerX);
+    }
+    Reset() {
+        if (this.CurrentPlayer !== this.playerX)
+            this.SetCurrentPlayer(this.playerX);
+        this.Board = new Array("", "", "", "", "", "", "", "", "");
+        this.IsGameActive = true;
     }
 }
 const resetButtuon = document.getElementById("reset_button");
 const tiles = Array.from(document.querySelectorAll(".tile"));
-const currentPlayer = document.getElementById("current_player_display");
-const game = new TicTacToe(resetButtuon, tiles, currentPlayer);
+const currentPlayerDisplay = document.getElementById("current_player_display");
+const gameAnnouncementElement = document.getElementById("announcement");
+const xmark = document.createElement("img");
+const omark = document.createElement("img");
+xmark.src = "../images/xmark.svg";
+omark.src = "../images/omark.svg";
+const DisplayCurrentPlayer = () => currentPlayerDisplay.textContent = "Current player is " + game.CurrentPlayer;
+const MarkTile = (tile, index) => {
+    if (!game.IsValidMove(index))
+        return;
+    if (game.CurrentPlayer == game.playerX)
+        tile.append(xmark.cloneNode());
+    else if (this.CurrentPlayer == this._playerO)
+        tile.append(omark.cloneNode());
+    game.MarkTile(index);
+};
+const ShowcaseGameEndState = () => {
+    if (game.IsTieGame) {
+        gameAnnouncementElement.setAttribute("class", "");
+        gameAnnouncementElement.textContent = "Game Is Tie";
+    }
+    else {
+        gameAnnouncementElement.setAttribute("class", "");
+        gameAnnouncementElement.textContent = game.CurrentPlayer + " Has Won";
+    }
+};
+const ResetGame = () => {
+    game.Reset();
+    tiles.forEach((tile) => {
+        tile.textContent = "";
+    });
+    gameAnnouncementElement.setAttribute("class", "hidden");
+    gameAnnouncementElement.textContent = "";
+};
+resetButtuon.addEventListener("click", () => ResetGame());
+tiles.forEach((element, index) => {
+    element.addEventListener("click", () => MarkTile(element, index));
+});
+const game = new TicTacToe();
+game.onGameEndEvent = ShowcaseGameEndState;
+game.onSetCurrentPlayerEvent = DisplayCurrentPlayer;
+game.Start();
